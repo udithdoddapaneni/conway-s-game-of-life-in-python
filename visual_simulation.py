@@ -31,9 +31,9 @@ def draw(surface, display_grid, grid):
         for j in range(len(grid)):
             R = display_grid[i][j]
             if grid[i][j] == 1: # alive
-                pg.draw.rect(surface, alive, R)
+                pg.draw.rect(surface, alive, R, border_radius=2)
             else: # dead
-                pg.draw.rect(surface, dead, R)
+                pg.draw.rect(surface, dead, R, border_radius=2)
 
 #button = pg.Rect()
 
@@ -45,9 +45,17 @@ display_grid = make_grid(env_grid)
 # seeding
 
 
-
+RESET = pg.Rect(200, 800, 200, 50)
 START = pg.Rect(0, 800, 200, 50)
-text = font.render('START', True, "orange")
+start_text = font.render('START', True, 'green')
+reset_text = font.render('RESET', True, 'green')
+
+def reset():
+    global env_grid
+
+    for i in range(len(env_grid)):
+        for j in range(len(env_grid[0])):
+            env_grid[i][j] = 0
 
 
 def simulate():
@@ -55,9 +63,11 @@ def simulate():
 
     FPS = 60
     start = False
-    screen.fill("green")
+    screen.fill("purple")
     pg.draw.rect(screen, "blue", START)
-    screen.blit(text, (30, 810))
+    pg.draw.rect(screen, "yellow", RESET)
+    screen.blit(start_text, (30, 810))
+    screen.blit(reset_text, (230, 810))
     running = True
     clock = pg.time.Clock()
     while running:
@@ -72,7 +82,14 @@ def simulate():
                     FPS = 5
                     start = True
                     pg.draw.rect(screen, "red", START)
-                elif i < len(env_grid) and j < len(env_grid[0]):
+                    screen.blit(start_text, (30, 810))
+                elif RESET.collidepoint(pos):
+                    FPS = 60
+                    start = False
+                    pg.draw.rect(screen, "blue", START)
+                    screen.blit(start_text, (30, 810))
+                    reset()
+                elif i < len(env_grid) and j < len(env_grid[0]) and not start:
                     if env_grid[i][j]:
                         env_grid[i][j] = 0
                     else:
